@@ -1,0 +1,127 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "default_company",
+  "auto_create_item",
+  "fg_item_group",
+  "default_material",
+  "column_break_s",
+  "set_bom_as_default",
+  "auto_submit_bom",
+  "model_unit",
+  "section_ops",
+  "with_operations",
+  "operations"
+ ],
+ "fields": [
+  {
+   "fieldname": "default_company",
+   "fieldtype": "Link",
+   "label": "Default Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "auto_create_item",
+   "fieldtype": "Check",
+   "label": "Create Finished Good Item When Missing",
+   "default": "1"
+  },
+  {
+   "fieldname": "fg_item_group",
+   "fieldtype": "Link",
+   "label": "Finished Good Item Group",
+   "options": "Item Group",
+   "depends_on": "eval:doc.auto_create_item",
+   "mandatory_depends_on": "eval:doc.auto_create_item"
+  },
+  {
+   "fieldname": "default_material",
+   "fieldtype": "Link",
+   "label": "Fallback Material",
+   "options": "Design Material Map",
+   "description": "Used for parts that have no mapped material."
+  },
+  {
+   "fieldname": "column_break_s",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "set_bom_as_default",
+   "fieldtype": "Check",
+   "label": "Set BOM as Default",
+   "default": "1"
+  },
+  {
+   "fieldname": "auto_submit_bom",
+   "fieldtype": "Check",
+   "label": "Submit BOM Automatically",
+   "default": "0"
+  },
+  {
+   "fieldname": "model_unit",
+   "fieldtype": "Select",
+   "label": "Unit of Uploaded 3D Models",
+   "options": "m\ncm\nmm",
+   "default": "m",
+   "description": "GLB/GLTF exports are usually in metres."
+  },
+  {
+   "fieldname": "section_ops",
+   "fieldtype": "Section Break",
+   "label": "Operations"
+  },
+  {
+   "fieldname": "with_operations",
+   "fieldtype": "Check",
+   "label": "Add Operations to BOM"
+  },
+  {
+   "fieldname": "operations",
+   "fieldtype": "Table",
+   "label": "Operations",
+   "options": "Designer Operation",
+   "depends_on": "eval:doc.with_operations"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Designer Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "issingle": 1
+}

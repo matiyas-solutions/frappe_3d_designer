@@ -1,0 +1,134 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "material_name",
+  "item_code",
+  "calculation_basis",
+  "wastage_percent",
+  "column_break_mat",
+  "default_thickness_mm",
+  "color",
+  "edge_band_item",
+  "section_alias",
+  "aliases"
+ ],
+ "fields": [
+  {
+   "fieldname": "material_name",
+   "fieldtype": "Data",
+   "label": "Material Name",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Raw Material Item",
+   "options": "Item",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "calculation_basis",
+   "fieldtype": "Select",
+   "label": "Calculation Basis",
+   "options": "Area\nVolume\nLength\nNos",
+   "default": "Area",
+   "in_list_view": 1,
+   "description": "Area = m², Volume = m³, Length = running metre of the longest side, Nos = pieces. Keep the item's stock UOM in the same unit."
+  },
+  {
+   "fieldname": "wastage_percent",
+   "fieldtype": "Percent",
+   "label": "Wastage %"
+  },
+  {
+   "fieldname": "column_break_mat",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_thickness_mm",
+   "fieldtype": "Float",
+   "label": "Default Thickness (mm)"
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Color",
+   "label": "Colour in 3D"
+  },
+  {
+   "fieldname": "edge_band_item",
+   "fieldtype": "Link",
+   "label": "Edge Banding Item",
+   "options": "Item",
+   "description": "Consumed in metres for banded edges of parts made from this material."
+  },
+  {
+   "fieldname": "section_alias",
+   "fieldtype": "Section Break",
+   "label": "Matching"
+  },
+  {
+   "fieldname": "aliases",
+   "fieldtype": "Small Text",
+   "label": "Names in Design Files",
+   "description": "One per line. Material names used in PYTHA, SketchUp or Blender exports that should map to this material."
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Design Material Map",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing User",
+   "read": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "report": 1,
+   "export": 0,
+   "print": 1,
+   "email": 1,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "autoname": "field:material_name",
+ "naming_rule": "By fieldname",
+ "search_fields": "item_code"
+}

@@ -1,0 +1,271 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "design_name",
+  "item",
+  "item_name",
+  "customer",
+  "column_break_main",
+  "company",
+  "status",
+  "auto_create_bom",
+  "section_file",
+  "design_file",
+  "column_break_file",
+  "file_format",
+  "section_preview",
+  "preview",
+  "section_parts",
+  "parts",
+  "section_totals",
+  "total_parts",
+  "column_break_t1",
+  "total_area_sqm",
+  "column_break_t2",
+  "total_edge_m",
+  "section_bom",
+  "bom",
+  "last_bom_sync",
+  "column_break_bom",
+  "bom_error",
+  "design_hash"
+ ],
+ "fields": [
+  {
+   "fieldname": "design_name",
+   "fieldtype": "Data",
+   "label": "Design Name",
+   "reqd": 1,
+   "in_list_view": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Finished Good Item",
+   "options": "Item",
+   "in_standard_filter": 1,
+   "description": "Leave empty to create the item automatically from Designer Settings."
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "fetch_from": "item.item_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "remember_last_selected_value": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nIn Design\nBOM Created\nApproved\nCancelled",
+   "default": "Draft",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "auto_create_bom",
+   "fieldtype": "Check",
+   "label": "Update BOM automatically",
+   "default": "1",
+   "description": "Every time parts change, a BOM is created or updated in the background."
+  },
+  {
+   "fieldname": "section_file",
+   "fieldtype": "Section Break",
+   "label": "Design File"
+  },
+  {
+   "fieldname": "design_file",
+   "fieldtype": "Attach",
+   "label": "Design File",
+   "description": "GLB, GLTF (embedded), OBJ, CSV or XLSX cut list, or a JSON saved from the 3D Designer. Parts are read from the file when you save."
+  },
+  {
+   "fieldname": "column_break_file",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "file_format",
+   "fieldtype": "Select",
+   "label": "File Format",
+   "read_only": 1,
+   "options": "\nNative JSON\nGLB\nGLTF\nOBJ\nCSV Cut List\nXLSX Cut List"
+  },
+  {
+   "fieldname": "section_preview",
+   "fieldtype": "Section Break",
+   "label": "3D Preview",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "preview",
+   "fieldtype": "HTML",
+   "label": "Preview"
+  },
+  {
+   "fieldname": "section_parts",
+   "fieldtype": "Section Break",
+   "label": "Parts"
+  },
+  {
+   "fieldname": "parts",
+   "fieldtype": "Table",
+   "label": "Parts",
+   "options": "Design Part"
+  },
+  {
+   "fieldname": "section_totals",
+   "fieldtype": "Section Break",
+   "label": "Totals"
+  },
+  {
+   "fieldname": "total_parts",
+   "fieldtype": "Int",
+   "label": "Total Parts",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_t1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_area_sqm",
+   "fieldtype": "Float",
+   "label": "Board Area (m²)",
+   "read_only": 1,
+   "no_copy": 1,
+   "precision": "3"
+  },
+  {
+   "fieldname": "column_break_t2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_edge_m",
+   "fieldtype": "Float",
+   "label": "Edge Banding (m)",
+   "read_only": 1,
+   "no_copy": 1,
+   "precision": "2"
+  },
+  {
+   "fieldname": "section_bom",
+   "fieldtype": "Section Break",
+   "label": "Manufacturing"
+  },
+  {
+   "fieldname": "bom",
+   "fieldtype": "Link",
+   "label": "BOM",
+   "options": "BOM",
+   "read_only": 1,
+   "no_copy": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "last_bom_sync",
+   "fieldtype": "Datetime",
+   "label": "Last BOM Update",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_bom",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bom_error",
+   "fieldtype": "Small Text",
+   "label": "Last BOM Error",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "design_hash",
+   "fieldtype": "Data",
+   "label": "Design Hash",
+   "hidden": 1,
+   "read_only": 1,
+   "no_copy": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Design Project",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing User",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 0,
+   "report": 1,
+   "export": 0,
+   "print": 1,
+   "email": 1,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "autoname": "format:DSN-{YYYY}-{#####}",
+ "naming_rule": "Expression",
+ "title_field": "design_name",
+ "show_title_field_in_link": 1,
+ "search_fields": "design_name,item,customer",
+ "track_changes": 1
+}

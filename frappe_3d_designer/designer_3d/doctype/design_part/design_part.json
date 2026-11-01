@@ -1,0 +1,181 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "part_name",
+  "material",
+  "item_code",
+  "source_material",
+  "orientation",
+  "column_break_dims",
+  "length_mm",
+  "width_mm",
+  "thickness_mm",
+  "qty",
+  "section_edge",
+  "edge_band_long",
+  "edge_band_short",
+  "column_break_edge",
+  "area_sqm",
+  "section_position",
+  "pos_x",
+  "pos_y",
+  "column_break_pos",
+  "pos_z",
+  "rot_y",
+  "mesh_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "part_name",
+   "fieldtype": "Data",
+   "label": "Part Name",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "material",
+   "fieldtype": "Link",
+   "label": "Material",
+   "options": "Design Material Map",
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Hardware Item",
+   "options": "Item",
+   "description": "For hinges, handles, legs etc. Counted per piece; material is ignored."
+  },
+  {
+   "fieldname": "source_material",
+   "fieldtype": "Data",
+   "label": "Material in File",
+   "read_only": 1
+  },
+  {
+   "fieldname": "orientation",
+   "fieldtype": "Select",
+   "label": "Orientation",
+   "options": "Horizontal\nVertical Side\nVertical Back",
+   "default": "Horizontal"
+  },
+  {
+   "fieldname": "column_break_dims",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "length_mm",
+   "fieldtype": "Float",
+   "label": "Length (mm)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "width_mm",
+   "fieldtype": "Float",
+   "label": "Width (mm)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "thickness_mm",
+   "fieldtype": "Float",
+   "label": "Thickness (mm)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Int",
+   "label": "Qty",
+   "default": "1",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "section_edge",
+   "fieldtype": "Section Break",
+   "label": "Edge Banding"
+  },
+  {
+   "fieldname": "edge_band_long",
+   "fieldtype": "Int",
+   "label": "Long Edges Banded",
+   "default": "0",
+   "description": "0, 1 or 2"
+  },
+  {
+   "fieldname": "edge_band_short",
+   "fieldtype": "Int",
+   "label": "Short Edges Banded",
+   "default": "0",
+   "description": "0, 1 or 2"
+  },
+  {
+   "fieldname": "column_break_edge",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "area_sqm",
+   "fieldtype": "Float",
+   "label": "Area (m²)",
+   "read_only": 1,
+   "precision": "4"
+  },
+  {
+   "fieldname": "section_position",
+   "fieldtype": "Section Break",
+   "label": "Position in 3D",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "pos_x",
+   "fieldtype": "Float",
+   "label": "X (mm)"
+  },
+  {
+   "fieldname": "pos_y",
+   "fieldtype": "Float",
+   "label": "Y (mm)"
+  },
+  {
+   "fieldname": "column_break_pos",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pos_z",
+   "fieldtype": "Float",
+   "label": "Z (mm)"
+  },
+  {
+   "fieldname": "rot_y",
+   "fieldtype": "Float",
+   "label": "Rotation (°)"
+  },
+  {
+   "fieldname": "mesh_id",
+   "fieldtype": "Data",
+   "label": "Mesh ID",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Design Part",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "istable": 1,
+ "editable_grid": 1
+}

@@ -1,0 +1,26 @@
+[project]
+name = "frappe_3d_designer"
+authors = [
+    { name = "Matiyas Solutions" }
+]
+description = "Parametric 3D furniture designer for ERPNext that turns design files into Manufacturing BOMs"
+requires-python = ">=3.14"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    # Reads GLB / GLTF / OBJ geometry server-side (pure Python + numpy)
+    "trimesh>=4.4",
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+# bench checks these before installing the app
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0,<17.0.0"
+erpnext = ">=16.0.0,<17.0.0"
+
+[tool.ruff]
+line-length = 110
+target-version = "py314"
