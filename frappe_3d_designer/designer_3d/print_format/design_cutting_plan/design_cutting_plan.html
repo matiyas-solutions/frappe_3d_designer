@@ -1,0 +1,12 @@
+{# Sheet cutting diagrams. Data from frappe_3d_designer.drawings.design_cutting_plans #}
+{% set plans = design_cutting_plans(doc.name) %}
+<h3>{{ doc.design_name }} · {{ _("Cutting plan") }}</h3>
+{% if not plans %}
+<p>{{ _("No cutting plan yet. Save the design to calculate it.") }}</p>
+{% endif %}
+{% for p in plans %}
+<div style="margin-bottom: 14px; page-break-inside: avoid;">
+	<div style="font-weight: 600; margin-bottom: 4px;">{{ p.title }}</div>
+	{{ p.svg }}
+</div>
+{% endfor %}

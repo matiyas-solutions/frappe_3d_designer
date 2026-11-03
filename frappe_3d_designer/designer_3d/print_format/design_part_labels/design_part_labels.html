@@ -1,0 +1,35 @@
+{# One 100 x 50 mm label per piece. Data from frappe_3d_designer.labels.design_part_labels #}
+<style>
+	@page { size: 100mm 50mm; margin: 0; }
+	.dl-label { width: 100mm; height: 50mm; box-sizing: border-box; padding: 3mm; page-break-after: always;
+		display: flex; gap: 3mm; font-family: Arial, sans-serif; color: #000; overflow: hidden; }
+	.dl-label:last-child { page-break-after: auto; }
+	.dl-main { flex: 1; min-width: 0; }
+	.dl-id { font-size: 15pt; font-weight: 700; line-height: 1.1; }
+	.dl-name { font-size: 10pt; font-weight: 600; margin-top: 1mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.dl-size { font-size: 12pt; font-weight: 700; margin-top: 1mm; }
+	.dl-meta { font-size: 8pt; line-height: 1.35; margin-top: 1mm; }
+	.dl-side { width: 24mm; text-align: center; }
+	.dl-side img.qr { width: 24mm; height: 24mm; }
+	.dl-grain { font-size: 18pt; line-height: 1; margin-top: 2mm; }
+	.dl-side .qr-fallback { font-size: 7pt; word-break: break-all; }
+</style>
+{% for l in design_part_labels(doc.name) %}
+<div class="dl-label">
+	<div class="dl-main">
+		<div class="dl-id">{{ l.label_id }}</div>
+		<div class="dl-name">{{ l.part_name }}</div>
+		<div class="dl-size">{{ l.size }}</div>
+		<div class="dl-meta">
+			{{ l.material }}<br>
+			{% if l.edges %}{{ _("Edges") }}: {{ l.edges }}<br>{% endif %}
+			{% if l.sheet %}{{ _("Sheet") }}: {{ l.sheet }}<br>{% endif %}
+			{{ l.design }}{% if l.customer %} · {{ l.customer }}{% endif %} · {{ l.copy }}
+		</div>
+	</div>
+	<div class="dl-side">
+		{{ l.qr }}
+		{% if l.grain %}<div class="dl-grain">{{ l.grain }}</div>{% endif %}
+	</div>
+</div>
+{% endfor %}
