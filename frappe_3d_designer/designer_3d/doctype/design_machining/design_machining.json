@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "part_idx",
+  "part_name",
+  "operation_type",
+  "face",
+  "direction",
+  "x_mm",
+  "y_mm",
+  "column_break_m",
+  "length_mm",
+  "width_mm",
+  "depth_mm",
+  "diameter_mm",
+  "tool",
+  "auto"
+ ],
+ "fields": [
+  {
+   "fieldname": "part_idx",
+   "fieldtype": "Int",
+   "label": "Part #",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "part_name",
+   "fieldtype": "Data",
+   "label": "Part",
+   "read_only": 1,
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "operation_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Drill\nGroove\nRoute\nPocket\nEdge Profile\nMiter",
+   "default": "Drill",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "face",
+   "fieldtype": "Select",
+   "label": "Face",
+   "options": "Top\nBottom\nLeft Edge\nRight Edge\nFront Edge\nBack Edge",
+   "default": "Top",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "direction",
+   "fieldtype": "Select",
+   "label": "Direction",
+   "options": "Along Length\nAlong Width",
+   "default": "Along Length"
+  },
+  {
+   "fieldname": "x_mm",
+   "fieldtype": "Float",
+   "label": "X (mm)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "y_mm",
+   "fieldtype": "Float",
+   "label": "Y (mm)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "column_break_m",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "length_mm",
+   "fieldtype": "Float",
+   "label": "Length (mm)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "width_mm",
+   "fieldtype": "Float",
+   "label": "Width (mm)"
+  },
+  {
+   "fieldname": "depth_mm",
+   "fieldtype": "Float",
+   "label": "Depth (mm)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "diameter_mm",
+   "fieldtype": "Float",
+   "label": "Diameter (mm)"
+  },
+  {
+   "fieldname": "tool",
+   "fieldtype": "Data",
+   "label": "Tool"
+  },
+  {
+   "fieldname": "auto",
+   "fieldtype": "Check",
+   "label": "Auto",
+   "read_only": 1,
+   "default": "0"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Design Machining",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "istable": 1,
+ "editable_grid": 1
+}

@@ -2,6 +2,7 @@
 
 Rules
 - Board parts are converted through Design Material Map:
+    Sheet  -> whole sheets from the nesting / cutting plan
     Area   -> L x W (m²) x qty
     Volume -> L x W x T (m³) x qty
     Length -> longest side (m) x qty
@@ -9,6 +10,7 @@ Rules
   plus wastage %. Same raw material across parts is consolidated into one BOM row.
 - Banded edges add the material's edge banding item in metres.
 - Parts with a Hardware Item are added per piece.
+- Joints add connector hardware (dowels, cams, screws) and drilling minutes from Connection Rules.
 - A draft BOM linked to the design is updated in place. A submitted BOM is never touched:
   a new BOM version is created instead (ERPNext keeps old versions for existing Work Orders).
 """
@@ -20,9 +22,11 @@ import frappe
 from frappe import _
 from frappe.utils import cint, flt, now_datetime
 
+from frappe_3d_designer.workshop import connector_requirements
+
 HASH_FIELDS = (
 	"part_name", "material", "item_code", "length_mm", "width_mm", "thickness_mm",
-	"qty", "edge_band_long", "edge_band_short",
+	"qty", "edge_band_long", "edge_band_short", "shape",
 )
 REALTIME_EVENT = "design_bom_synced"
 
@@ -50,10 +54,12 @@ def edge_length_m(part) -> float:
 def parts_hash(doc) -> str:
 	payload = [{f: doc_part.get(f) for f in HASH_FIELDS} for doc_part in doc.parts]
 	payload.append({"item": doc.item, "company": doc.company})
+	payload.append([(j.connection_rule, j.connector_count) for j in doc.get("joints") or []])
+	payload.append([(s.material, s.sheet_no) for s in doc.get("sheet_layouts") or []])
 	return hashlib.md5(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
 
 
-def collect_materials(doc, settings) -> tuple[dict[str, float], list[str]]:
+def collect_materials(doc, settings) -> tuple[dict[str, float], list[str], dict[tuple, float]]:
 	totals: dict[str, float] = {}
 	errors: list[str] = []
 	cache: dict[str, object] = {}
@@ -82,11 +88,29 @@ def collect_materials(doc, settings) -> tuple[dict[str, float], list[str]]:
 		material = cache[material_name]
 		waste = 1 + flt(material.wastage_percent) / 100
 
-		add(material.item_code, part_quantity(p, material.calculation_basis) * waste)
+		if material.calculation_basis != "Sheet":
+			add(material.item_code, part_quantity(p, material.calculation_basis) * waste)
+		elif p.material != material_name:
+			errors.append(
+				_("Row {0}: {1} uses the fallback material, which is sheet based. Set its material so it can be nested.").format(
+					p.idx, frappe.bold(p.part_name)
+				)
+			)
 		if material.edge_band_item:
 			add(material.edge_band_item, edge_length_m(p) * waste)
 
-	return totals, errors
+	# whole sheets from the cutting plan
+	for row in doc.get("sheet_layouts") or []:
+		if row.material not in cache:
+			cache[row.material] = frappe.get_cached_doc("Design Material Map", row.material)
+		add(cache[row.material].item_code, 1.0)
+
+	# connector hardware and drilling time from joints
+	items, ops = connector_requirements(doc)
+	for code, qty in items.items():
+		add(code, qty)
+
+	return totals, errors, ops
 
 
 # ------------------------------------------------------------------ finished good
@@ -129,7 +153,7 @@ def _editable_bom(doc):
 	return None
 
 
-def _fill_bom(bom, doc, item_code, totals, settings):
+def _fill_bom(bom, doc, item_code, totals, settings, joint_ops=None):
 	bom.item = item_code
 	bom.company = doc.company
 	bom.quantity = 1
@@ -146,18 +170,22 @@ def _fill_bom(bom, doc, item_code, totals, settings):
 		)
 
 	bom.with_operations = 0
-	if cint(settings.with_operations) and settings.operations:
+	if not cint(settings.with_operations):
+		return
+	minutes: dict[tuple, float] = {}
+	part_count = sum(cint(p.qty) or 1 for p in doc.parts if not p.item_code)
+	for op in settings.operations or []:
+		key = (op.operation, op.workstation)
+		minutes[key] = minutes.get(key, 0.0) + flt(op.time_in_mins) * (part_count if cint(op.per_part) else 1)
+	for key, mins in (joint_ops or {}).items():
+		minutes[key] = minutes.get(key, 0.0) + mins
+	if minutes:
 		bom.with_operations = 1
-		part_count = sum(cint(p.qty) or 1 for p in doc.parts if not p.item_code)
-		for op in settings.operations:
-			bom.append(
-				"operations",
-				{
-					"operation": op.operation,
-					"workstation": op.workstation,
-					"time_in_mins": flt(op.time_in_mins) * (part_count if cint(op.per_part) else 1),
-				},
-			)
+	for (operation, workstation), mins in minutes.items():
+		bom.append(
+			"operations",
+			{"operation": operation, "workstation": workstation, "time_in_mins": flt(mins, 2) or 1},
+		)
 
 
 def sync_bom(design: str, force: bool = False) -> str:
@@ -175,14 +203,14 @@ def sync_bom(design: str, force: bool = False) -> str:
 	if not force and doc.bom and doc.design_hash == new_hash and frappe.db.exists("BOM", doc.bom):
 		return doc.bom
 
-	totals, errors = collect_materials(doc, settings)
+	totals, errors, joint_ops = collect_materials(doc, settings)
 	if errors:
 		frappe.throw("<br>".join(errors), title=_("BOM not generated"))
 	if not totals:
 		frappe.throw(_("No raw materials could be calculated. Check part sizes and material mapping."))
 
 	bom = _editable_bom(doc) or frappe.new_doc("BOM")
-	_fill_bom(bom, doc, item_code, totals, settings)
+	_fill_bom(bom, doc, item_code, totals, settings, joint_ops)
 	bom.save()
 	if cint(settings.auto_submit_bom):
 		bom.submit()

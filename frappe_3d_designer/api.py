@@ -30,6 +30,8 @@ def get_design(name: str):
 		"status": doc.status,
 		"bom": doc.bom,
 		"bom_error": doc.bom_error,
+		"total_sheets": doc.total_sheets,
+		"total_connectors": doc.total_connectors,
 		"design_file": doc.design_file,
 		"file_format": doc.file_format,
 		"model_scale": UNIT_TO_MM.get(unit, 1000.0),
@@ -72,3 +74,79 @@ def save_design(parts, name: str | None = None, design_name: str | None = None, 
 def generate_bom(name: str, force: int | str = 0):
 	frappe.get_doc("Design Project", name).check_permission("write")
 	return sync_bom(name, force=bool(cint(force)))
+
+
+# ------------------------------------------------------------------ workshop, drawings, output
+def _readable(name: str):
+	doc = frappe.get_doc("Design Project", name)
+	doc.check_permission("read")
+	return doc
+
+
+@frappe.whitelist()
+def get_workshop(name: str):
+	"""Boreholes and grooves in world coordinates for the 3D overlay."""
+	from frappe_3d_designer.workshop import build_workshop
+
+	doc = _readable(name)
+	ws = build_workshop(doc.parts, frappe.get_cached_doc("Designer Settings"))
+	return {"holes": ws["holes"], "grooves": ws["grooves"], "joints": ws["joints"]}
+
+
+@frappe.whitelist()
+def get_drawing(name: str):
+	from frappe_3d_designer.drawings import technical_drawing_svg
+
+	return technical_drawing_svg(_readable(name))
+
+
+@frappe.whitelist()
+def get_cutting_plan(name: str):
+	from frappe_3d_designer.drawings import cutting_plan_svgs
+
+	return cutting_plan_svgs(_readable(name))
+
+
+@frappe.whitelist(methods=["POST"])
+def export_cnc(name: str):
+	from frappe_3d_designer.cnc_export import export_cnc as _export
+
+	doc = frappe.get_doc("Design Project", name)
+	doc.check_permission("write")
+	return _export(doc)
+
+
+@frappe.whitelist()
+def get_library():
+	return frappe.get_all(
+		"Design Library Component",
+		fields=["name", "category", "item_code", "shape", "orientation", "length_mm", "width_mm",
+			"thickness_mm", "image", "description"],
+		order_by="category asc, name asc",
+	)
+
+
+@frappe.whitelist(methods=["POST"])
+def save_render(name: str, data_url: str):
+	import base64
+
+	doc = frappe.get_doc("Design Project", name)
+	doc.check_permission("write")
+	if not data_url.startswith("data:image/png;base64,"):
+		frappe.throw(_("Render must be a PNG image."))
+	content = base64.b64decode(data_url.split(",", 1)[1])
+	if len(content) > 15 * 1024 * 1024:
+		frappe.throw(_("Render is too large."))
+	file_doc = frappe.get_doc(
+		{
+			"doctype": "File",
+			"file_name": f"{doc.name}-render.png",
+			"attached_to_doctype": "Design Project",
+			"attached_to_name": doc.name,
+			"attached_to_field": "render_image",
+			"is_private": 0,
+			"content": content,
+		}
+	).insert(ignore_permissions=True)
+	doc.db_set("render_image", file_doc.file_url)
+	return file_doc.file_url

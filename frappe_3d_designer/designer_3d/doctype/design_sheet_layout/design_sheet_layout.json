@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "material",
+  "sheet_no",
+  "sheet_size",
+  "parts_count",
+  "utilisation_percent",
+  "layout_json"
+ ],
+ "fields": [
+  {
+   "fieldname": "material",
+   "fieldtype": "Link",
+   "label": "Material",
+   "options": "Design Material Map",
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "sheet_no",
+   "fieldtype": "Int",
+   "label": "Sheet No",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "sheet_size",
+   "fieldtype": "Data",
+   "label": "Sheet Size",
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "parts_count",
+   "fieldtype": "Int",
+   "label": "Parts",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "utilisation_percent",
+   "fieldtype": "Percent",
+   "label": "Utilisation",
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "layout_json",
+   "fieldtype": "Long Text",
+   "label": "Layout",
+   "hidden": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Design Sheet Layout",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "istable": 1
+}

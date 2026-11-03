@@ -13,6 +13,12 @@
   "set_bom_as_default",
   "auto_submit_bom",
   "model_unit",
+  "section_workshop",
+  "default_connection_rule",
+  "thin_panel_rule",
+  "column_break_ws",
+  "thin_panel_max_mm",
+  "joint_tolerance_mm",
   "section_ops",
   "with_operations",
   "operations"
@@ -68,6 +74,41 @@
    "options": "m\ncm\nmm",
    "default": "m",
    "description": "GLB/GLTF exports are usually in metres."
+  },
+  {
+   "fieldname": "section_workshop",
+   "fieldtype": "Section Break",
+   "label": "Workshop"
+  },
+  {
+   "fieldname": "default_connection_rule",
+   "fieldtype": "Link",
+   "label": "Default Connection Rule",
+   "options": "Design Connection Rule"
+  },
+  {
+   "fieldname": "thin_panel_rule",
+   "fieldtype": "Link",
+   "label": "Connection Rule for Thin Panels",
+   "options": "Design Connection Rule",
+   "description": "Used when one of the two panels is thinner than the limit, e.g. back panels."
+  },
+  {
+   "fieldname": "column_break_ws",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "thin_panel_max_mm",
+   "fieldtype": "Float",
+   "label": "Thin Panel Limit (mm)",
+   "default": "8"
+  },
+  {
+   "fieldname": "joint_tolerance_mm",
+   "fieldtype": "Float",
+   "label": "Joint Tolerance (mm)",
+   "default": "1",
+   "description": "Panels closer than this are treated as touching."
   },
   {
    "fieldname": "section_ops",

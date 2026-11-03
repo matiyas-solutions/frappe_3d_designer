@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "part_a_idx",
+  "part_a",
+  "part_b_idx",
+  "part_b",
+  "column_break_j",
+  "connection_rule",
+  "joint_length_mm",
+  "connector_count",
+  "auto"
+ ],
+ "fields": [
+  {
+   "fieldname": "part_a_idx",
+   "fieldtype": "Int",
+   "label": "Part # (Face)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "part_a",
+   "fieldtype": "Data",
+   "label": "Face Part",
+   "read_only": 1,
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "part_b_idx",
+   "fieldtype": "Int",
+   "label": "Part # (Edge)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "part_b",
+   "fieldtype": "Data",
+   "label": "Edge Part",
+   "read_only": 1,
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "column_break_j",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "connection_rule",
+   "fieldtype": "Link",
+   "label": "Connection Rule",
+   "options": "Design Connection Rule",
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "joint_length_mm",
+   "fieldtype": "Float",
+   "label": "Joint Length (mm)",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "connector_count",
+   "fieldtype": "Int",
+   "label": "Connectors",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "auto",
+   "fieldtype": "Check",
+   "label": "Auto",
+   "read_only": 1,
+   "default": "0"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Design Joint",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "istable": 1,
+ "editable_grid": 1
+}

@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "component_name",
+  "category",
+  "item_code",
+  "image",
+  "column_break_c",
+  "shape",
+  "orientation",
+  "length_mm",
+  "width_mm",
+  "thickness_mm",
+  "section_desc",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "component_name",
+   "fieldtype": "Data",
+   "label": "Component Name",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "default": "Fitting",
+   "options": "Fitting\nHinge\nHandle\nLeg\nDrawer Runner\nConnector\nProfile\nPanel\nOther"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Image"
+  },
+  {
+   "fieldname": "column_break_c",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shape",
+   "fieldtype": "Select",
+   "label": "Shape",
+   "options": "Box\nCylinder",
+   "default": "Box"
+  },
+  {
+   "fieldname": "orientation",
+   "fieldtype": "Select",
+   "label": "Orientation",
+   "options": "Horizontal\nVertical Side\nVertical Back",
+   "default": "Horizontal"
+  },
+  {
+   "fieldname": "length_mm",
+   "fieldtype": "Float",
+   "label": "Length (mm)"
+  },
+  {
+   "fieldname": "width_mm",
+   "fieldtype": "Float",
+   "label": "Width (mm)"
+  },
+  {
+   "fieldname": "thickness_mm",
+   "fieldtype": "Float",
+   "label": "Thickness (mm)"
+  },
+  {
+   "fieldname": "section_desc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Design Library Component",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing User",
+   "read": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "report": 1,
+   "export": 0,
+   "print": 1,
+   "email": 1,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "autoname": "field:component_name",
+ "naming_rule": "By fieldname",
+ "image_field": "image"
+}

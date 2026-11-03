@@ -44,6 +44,30 @@ frappe.ui.form.on("Design Project", {
 			if (frm.doc.bom) {
 				frm.add_custom_button(__("View BOM"), () => frappe.set_route("Form", "BOM", frm.doc.bom), __("Manufacturing"));
 			}
+			const printView = (format) => {
+				if (frm.is_dirty()) return frappe.show_alert(__("Save the design first"));
+				const q = new URLSearchParams({ doctype: frm.doctype, name: frm.doc.name, format, no_letterhead: 1 });
+				window.open(`/printview?${q}`, "_blank");
+			};
+			frm.add_custom_button(__("Technical drawing"), () => frm.trigger("show_drawing"), __("Output"));
+			frm.add_custom_button(__("Cutting plan"), () => printView("Design Cutting Plan"), __("Output"));
+			frm.add_custom_button(__("Part labels"), () => printView("Design Part Labels"), __("Output"));
+			frm.add_custom_button(
+				__("Export for CNC"),
+				() =>
+					frappe
+						.call({
+							method: "frappe_3d_designer.api.export_cnc",
+							args: { name: frm.doc.name },
+							freeze: true,
+							freeze_message: __("Preparing CNC files"),
+						})
+						.then((r) => {
+							window.open(r.message, "_blank");
+							frm.reload_doc();
+						}),
+				__("Output")
+			);
 			if (frm.doc.design_file) {
 				frm.add_custom_button(__("Read design file again"), () =>
 					frm.call("reimport_design_file").then(() => frm.reload_doc())
@@ -54,6 +78,49 @@ frappe.ui.form.on("Design Project", {
 		}
 
 		frm.trigger("render_preview");
+		frm.trigger("render_cutting_plan");
+	},
+
+	show_drawing(frm) {
+		frappe.xcall("frappe_3d_designer.api.get_drawing", { name: frm.doc.name }).then((svg) => {
+			const d = new frappe.ui.Dialog({
+				title: __("Technical drawing"),
+				size: "extra-large",
+				fields: [{ fieldname: "svg", fieldtype: "HTML" }],
+				primary_action_label: __("Print"),
+				primary_action: () => {
+					const q = new URLSearchParams({
+						doctype: frm.doctype,
+						name: frm.doc.name,
+						format: "Design Technical Drawing",
+						no_letterhead: 1,
+					});
+					window.open(`/printview?${q}`, "_blank");
+				},
+			});
+			d.get_field("svg").$wrapper.html(svg);
+			d.show();
+		});
+	},
+
+	render_cutting_plan(frm) {
+		const wrapper = frm.get_field("cutting_plan").$wrapper.empty();
+		if (frm.is_new() || !(frm.doc.sheet_layouts || []).length) {
+			wrapper.html(
+				`<p class="text-muted small">${__("Parts with a sheet-based material are nested here after saving.")}</p>`
+			);
+			return;
+		}
+		frappe.xcall("frappe_3d_designer.api.get_cutting_plan", { name: frm.doc.name }).then((plans) => {
+			wrapper.empty();
+			plans.forEach((plan) => {
+				$(`<div style="margin-bottom:16px"><div class="small" style="font-weight:600;margin-bottom:6px"></div></div>`)
+					.appendTo(wrapper)
+					.find("div")
+					.text(plan.title)
+					.after(plan.svg);
+			});
+		});
 	},
 
 	render_preview(frm) {
@@ -82,5 +149,48 @@ frappe.ui.form.on("Design Project", {
 frappe.ui.form.on("Design Part", {
 	parts_remove(frm) {
 		frm.trigger("render_preview");
+		frm.trigger("render_cutting_plan");
+	},
+
+	show_drawing(frm) {
+		frappe.xcall("frappe_3d_designer.api.get_drawing", { name: frm.doc.name }).then((svg) => {
+			const d = new frappe.ui.Dialog({
+				title: __("Technical drawing"),
+				size: "extra-large",
+				fields: [{ fieldname: "svg", fieldtype: "HTML" }],
+				primary_action_label: __("Print"),
+				primary_action: () => {
+					const q = new URLSearchParams({
+						doctype: frm.doctype,
+						name: frm.doc.name,
+						format: "Design Technical Drawing",
+						no_letterhead: 1,
+					});
+					window.open(`/printview?${q}`, "_blank");
+				},
+			});
+			d.get_field("svg").$wrapper.html(svg);
+			d.show();
+		});
+	},
+
+	render_cutting_plan(frm) {
+		const wrapper = frm.get_field("cutting_plan").$wrapper.empty();
+		if (frm.is_new() || !(frm.doc.sheet_layouts || []).length) {
+			wrapper.html(
+				`<p class="text-muted small">${__("Parts with a sheet-based material are nested here after saving.")}</p>`
+			);
+			return;
+		}
+		frappe.xcall("frappe_3d_designer.api.get_cutting_plan", { name: frm.doc.name }).then((plans) => {
+			wrapper.empty();
+			plans.forEach((plan) => {
+				$(`<div style="margin-bottom:16px"><div class="small" style="font-weight:600;margin-bottom:6px"></div></div>`)
+					.appendTo(wrapper)
+					.find("div")
+					.text(plan.title)
+					.after(plan.svg);
+			});
+		});
 	},
 });

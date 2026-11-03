@@ -1,0 +1,185 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-10-31 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "rule_name",
+  "connection_type",
+  "spacing_mm",
+  "min_per_joint",
+  "edge_offset_mm",
+  "column_break_r",
+  "face_diameter_mm",
+  "face_depth_mm",
+  "edge_diameter_mm",
+  "edge_depth_mm",
+  "groove_depth_mm",
+  "section_items",
+  "items",
+  "section_op",
+  "operation",
+  "workstation",
+  "column_break_op",
+  "mins_per_connector"
+ ],
+ "fields": [
+  {
+   "fieldname": "rule_name",
+   "fieldtype": "Data",
+   "label": "Rule Name",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "connection_type",
+   "fieldtype": "Select",
+   "label": "Connection Type",
+   "in_list_view": 1,
+   "default": "Dowel",
+   "options": "Dowel\nCam and Dowel\nScrew\nConfirmat\nBiscuit\nShelf Pin\nGroove\nMiter\nOther"
+  },
+  {
+   "fieldname": "spacing_mm",
+   "fieldtype": "Float",
+   "label": "Max Spacing (mm)",
+   "default": "160"
+  },
+  {
+   "fieldname": "min_per_joint",
+   "fieldtype": "Int",
+   "label": "Min per Joint",
+   "default": "2"
+  },
+  {
+   "fieldname": "edge_offset_mm",
+   "fieldtype": "Float",
+   "label": "Offset from Joint End (mm)",
+   "default": "50"
+  },
+  {
+   "fieldname": "column_break_r",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "face_diameter_mm",
+   "fieldtype": "Float",
+   "label": "Face Hole Diameter (mm)",
+   "default": "8"
+  },
+  {
+   "fieldname": "face_depth_mm",
+   "fieldtype": "Float",
+   "label": "Face Hole Depth (mm)",
+   "default": "12"
+  },
+  {
+   "fieldname": "edge_diameter_mm",
+   "fieldtype": "Float",
+   "label": "Edge Hole Diameter (mm)",
+   "default": "8"
+  },
+  {
+   "fieldname": "edge_depth_mm",
+   "fieldtype": "Float",
+   "label": "Edge Hole Depth (mm)",
+   "default": "25"
+  },
+  {
+   "fieldname": "groove_depth_mm",
+   "fieldtype": "Float",
+   "label": "Groove Depth (mm)",
+   "default": "8",
+   "depends_on": "eval:doc.connection_type=='Groove'"
+  },
+  {
+   "fieldname": "section_items",
+   "fieldtype": "Section Break",
+   "label": "Hardware per Connector"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Design Connection Item"
+  },
+  {
+   "fieldname": "section_op",
+   "fieldtype": "Section Break",
+   "label": "Operation"
+  },
+  {
+   "fieldname": "operation",
+   "fieldtype": "Link",
+   "label": "Operation",
+   "options": "Operation"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "column_break_op",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mins_per_connector",
+   "fieldtype": "Float",
+   "label": "Minutes per Connector"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-10-31 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Designer 3D",
+ "name": "Design Connection Rule",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "Manufacturing User",
+   "read": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "report": 1,
+   "export": 0,
+   "print": 1,
+   "email": 1,
+   "share": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "autoname": "field:rule_name",
+ "naming_rule": "By fieldname"
+}
