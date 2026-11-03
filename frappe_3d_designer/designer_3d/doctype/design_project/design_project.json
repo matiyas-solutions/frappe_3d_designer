@@ -21,6 +21,25 @@
   "preview",
   "section_parts",
   "parts",
+  "section_workshop",
+  "auto_detect_joints",
+  "column_break_ws",
+  "total_connectors",
+  "section_joints",
+  "joints",
+  "machining",
+  "section_cutting",
+  "total_sheets",
+  "column_break_cut",
+  "average_utilisation",
+  "section_cutting_2",
+  "cutting_plan",
+  "sheet_layouts",
+  "section_output",
+  "section_height_mm",
+  "render_image",
+  "column_break_out",
+  "cnc_export_file",
   "section_totals",
   "total_parts",
   "column_break_t1",
@@ -136,6 +155,118 @@
    "fieldtype": "Table",
    "label": "Parts",
    "options": "Design Part"
+  },
+  {
+   "fieldname": "section_workshop",
+   "fieldtype": "Section Break",
+   "label": "Workshop: Joints and Machining",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "auto_detect_joints",
+   "fieldtype": "Check",
+   "label": "Detect Joints Automatically",
+   "default": "1",
+   "description": "Touching panels get connectors (dowels, cams, screws, grooves) from Design Connection Rules on every save."
+  },
+  {
+   "fieldname": "column_break_ws",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_connectors",
+   "fieldtype": "Int",
+   "label": "Total Connectors",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "section_joints",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "joints",
+   "fieldtype": "Table",
+   "label": "Joints",
+   "options": "Design Joint"
+  },
+  {
+   "fieldname": "machining",
+   "fieldtype": "Table",
+   "label": "Machining",
+   "options": "Design Machining",
+   "description": "Own boreholes, grooves, routing and edge profiles. Part # is the row number in Parts. Rows marked Auto are rebuilt on save."
+  },
+  {
+   "fieldname": "section_cutting",
+   "fieldtype": "Section Break",
+   "label": "Cutting Plan",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "total_sheets",
+   "fieldtype": "Int",
+   "label": "Total Sheets",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_cut",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "average_utilisation",
+   "fieldtype": "Percent",
+   "label": "Average Sheet Utilisation",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "section_cutting_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "cutting_plan",
+   "fieldtype": "HTML",
+   "label": "Cutting Plan"
+  },
+  {
+   "fieldname": "sheet_layouts",
+   "fieldtype": "Table",
+   "label": "Sheet Layouts",
+   "options": "Design Sheet Layout",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "section_output",
+   "fieldtype": "Section Break",
+   "label": "Drawings and Output",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "section_height_mm",
+   "fieldtype": "Float",
+   "label": "Section A-A Height (mm)",
+   "description": "Horizontal cut used in the technical drawing. Empty = half the height."
+  },
+  {
+   "fieldname": "render_image",
+   "fieldtype": "Attach Image",
+   "label": "Presentation Render",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_out",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cnc_export_file",
+   "fieldtype": "Attach",
+   "label": "Last CNC Export",
+   "read_only": 1,
+   "no_copy": 1
   },
   {
    "fieldname": "section_totals",

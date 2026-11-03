@@ -41,10 +41,11 @@ HEADER_ALIASES = {
 	"edge_band_long": ("edge long", "edge_long", "eb long", "edge l", "long edges", "kante lang"),
 	"edge_band_short": ("edge short", "edge_short", "eb short", "edge w", "short edges", "kante kurz"),
 	"orientation": ("orientation",),
+	"grain": ("grain", "grain direction", "maserung", "faser"),
 }
 
 PART_KEYS = (
-	"part_name", "material", "item_code", "source_material", "orientation",
+	"part_name", "material", "item_code", "source_material", "orientation", "shape", "grain",
 	"length_mm", "width_mm", "thickness_mm", "qty", "edge_band_long", "edge_band_short",
 	"pos_x", "pos_y", "pos_z", "rot_y", "mesh_id",
 )
@@ -224,6 +225,10 @@ def clean_part(raw: dict) -> dict:
 		part[key] = min(max(cint(part.get(key)), 0), 2)
 	if part.get("orientation") not in ORIENTATIONS:
 		part["orientation"] = "Horizontal"
+	if part.get("shape") not in ("Box", "Cylinder"):
+		part["shape"] = "Box"
+	if part.get("grain") not in ("Along Length", "Along Width"):
+		part["grain"] = None
 	return part
 
 

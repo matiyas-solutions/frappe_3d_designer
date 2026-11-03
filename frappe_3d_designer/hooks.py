@@ -28,3 +28,13 @@ doc_events = {
 
 after_install = "frappe_3d_designer.install.after_install"
 after_migrate = "frappe_3d_designer.install.after_install"
+
+# helpers available in print formats (labels, drawings, cutting plans)
+jinja = {
+	"methods": [
+		"frappe_3d_designer.labels.design_part_qr",
+		"frappe_3d_designer.labels.design_part_labels",
+		"frappe_3d_designer.drawings.design_technical_drawing",
+		"frappe_3d_designer.drawings.design_cutting_plans",
+	]
+}

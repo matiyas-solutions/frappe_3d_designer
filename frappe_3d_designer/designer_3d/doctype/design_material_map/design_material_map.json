@@ -13,6 +13,13 @@
   "default_thickness_mm",
   "color",
   "edge_band_item",
+  "has_grain",
+  "section_sheet",
+  "sheet_length_mm",
+  "sheet_width_mm",
+  "column_break_sheet",
+  "kerf_mm",
+  "trim_mm",
   "section_alias",
   "aliases"
  ],
@@ -37,10 +44,10 @@
    "fieldname": "calculation_basis",
    "fieldtype": "Select",
    "label": "Calculation Basis",
-   "options": "Area\nVolume\nLength\nNos",
-   "default": "Area",
+   "options": "Sheet\nArea\nVolume\nLength\nNos",
+   "default": "Sheet",
    "in_list_view": 1,
-   "description": "Area = m², Volume = m³, Length = running metre of the longest side, Nos = pieces. Keep the item's stock UOM in the same unit."
+   "description": "Sheet = whole boards from nesting (stock UOM Nos). Area = m², Volume = m³, Length = running metre of the longest side, Nos = pieces."
   },
   {
    "fieldname": "wastage_percent",
@@ -67,6 +74,46 @@
    "label": "Edge Banding Item",
    "options": "Item",
    "description": "Consumed in metres for banded edges of parts made from this material."
+  },
+  {
+   "fieldname": "has_grain",
+   "fieldtype": "Check",
+   "label": "Has Grain",
+   "description": "Parts with a grain direction are not rotated during nesting."
+  },
+  {
+   "fieldname": "section_sheet",
+   "fieldtype": "Section Break",
+   "label": "Sheet Size",
+   "depends_on": "eval:doc.calculation_basis=='Sheet'"
+  },
+  {
+   "fieldname": "sheet_length_mm",
+   "fieldtype": "Float",
+   "label": "Sheet Length (mm)",
+   "default": "2440"
+  },
+  {
+   "fieldname": "sheet_width_mm",
+   "fieldtype": "Float",
+   "label": "Sheet Width (mm)",
+   "default": "1220"
+  },
+  {
+   "fieldname": "column_break_sheet",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "kerf_mm",
+   "fieldtype": "Float",
+   "label": "Saw Kerf (mm)",
+   "default": "4"
+  },
+  {
+   "fieldname": "trim_mm",
+   "fieldtype": "Float",
+   "label": "Edge Trim per Side (mm)",
+   "default": "10"
   },
   {
    "fieldname": "section_alias",
