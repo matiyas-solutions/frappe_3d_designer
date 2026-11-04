@@ -76,14 +76,14 @@ def seed_connection_rules():
 	settings.save(ignore_permissions=True)
 
 
-def _ensure(doctype, name, **values):
-	if frappe.db.exists(doctype, name):
-		return name
+def _ensure(doctype, docname, **values):
+	if frappe.db.exists(doctype, docname):
+		return docname
 	try:
 		frappe.get_doc({"doctype": doctype, **values}).insert(ignore_permissions=True)
-		return name
+		return docname
 	except Exception:
-		frappe.log_error(title=f"3D Designer: could not create {doctype} {name}")
+		frappe.log_error(title=f"3D Designer: could not create {doctype} {docname}")
 		return None
 
 
