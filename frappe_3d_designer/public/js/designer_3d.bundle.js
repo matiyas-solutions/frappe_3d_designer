@@ -675,6 +675,7 @@ class Designer {
 		});
 		btn($t, __("From library"), () => this.libraryDialog(), __("Fittings, handles, legs and profiles"));
 		btn($t, __("Cabinet"), () => this.cabinetDialog(), __("Build a parametric cabinet"));
+		btn($t, __("Furniture"), () => this.furnitureDialog(), __("Tables, chairs, beds, shelves and more"));
 
 		$(`<span class="f3d-gap"></span>`).appendTo($t);
 		this.$dup = btn($t, __("Duplicate"), () => this.duplicate());
@@ -961,7 +962,7 @@ class Designer {
 		const p = normalisePart({
 			...preset,
 			part_name: __(preset.label),
-			material: this.defaultMaterial(preset.thickness_mm <= 8 ? 8 : null),
+			material: this.defaultMaterial(num(overrides.thickness_mm ?? preset.thickness_mm) <= 8 ? 8 : null),
 			...overrides,
 		});
 		if (!overrides.pos_y) p.pos_y = partSize(p).y / 2;
@@ -1056,6 +1057,143 @@ class Designer {
 		}
 		if (P > 0) {
 			add("top", { part_name: __("Plinth"), orientation: "Vertical Back", length_mm: W, width_mm: P, pos_y: P / 2, pos_z: D / 2 - 50, edge_band_long: 1 });
+		}
+
+		if (v.replace) this.parts.splice(0, this.parts.length);
+		this.parts.push(...parts);
+		this.core.setParts(this.parts);
+		this.core.fit();
+		this.select(null);
+		this.markDirty();
+	}
+
+	furnitureDialog() {
+		// width = left-right (x), depth = front-back (z), height = up (y)
+		const TYPES = {
+			"Dining Table": { width: 1500, depth: 850, height: 750, thickness: 25, leg: 60 },
+			"Coffee Table": { width: 1000, depth: 550, height: 450, thickness: 25, leg: 50 },
+			"Study Desk": { width: 1200, depth: 600, height: 750, thickness: 25, leg: 50 },
+			"Bench": { width: 1200, depth: 350, height: 450, thickness: 30, leg: 50 },
+			"Chair": { width: 450, depth: 450, height: 900, thickness: 25, leg: 40 },
+			"Bed": { width: 1500, depth: 2000, height: 1000, thickness: 30, leg: 70 },
+			"Bookshelf": { width: 800, depth: 300, height: 1800, thickness: 18, leg: 0 },
+			"TV Unit": { width: 1600, depth: 400, height: 500, thickness: 18, leg: 0 },
+		};
+		const isOf = (...t) => `eval:${JSON.stringify(t)}.includes(doc.type)`;
+		const d = new frappe.ui.Dialog({
+			title: __("Furniture"),
+			fields: [
+				{
+					fieldname: "type", fieldtype: "Select", label: __("Type"), options: Object.keys(TYPES).join("\n"),
+					default: "Dining Table", reqd: 1,
+					change: () => {
+						const t = TYPES[d.get_value("type")];
+						if (t) d.set_values({ width: t.width, depth: t.depth, height: t.height, thickness: t.thickness, leg_size: t.leg });
+					},
+				},
+				{ fieldname: "width", fieldtype: "Float", label: __("Width (mm)"), default: 1500, reqd: 1 },
+				{ fieldname: "depth", fieldtype: "Float", label: __("Depth / length (mm)"), default: 850, reqd: 1 },
+				{ fieldname: "height", fieldtype: "Float", label: __("Overall height (mm)"), default: 750, reqd: 1, description: __("Bed: headboard height") },
+				{ fieldname: "cb1", fieldtype: "Column Break" },
+				{ fieldname: "thickness", fieldtype: "Float", label: __("Top / seat / board thickness (mm)"), default: 25, reqd: 1 },
+				{ fieldname: "leg_size", fieldtype: "Float", label: __("Leg / post size (mm)"), default: 60, depends_on: isOf("Dining Table", "Coffee Table", "Study Desk", "Bench", "Chair", "Bed") },
+				{ fieldname: "leg_style", fieldtype: "Select", label: __("Leg style"), options: "Square\nRound", default: "Square", depends_on: isOf("Dining Table", "Coffee Table", "Study Desk", "Bench", "Chair") },
+				{ fieldname: "apron", fieldtype: "Check", label: __("Apron (rails under the top)"), default: 1, depends_on: isOf("Dining Table", "Coffee Table", "Study Desk", "Bench") },
+				{ fieldname: "seat_height", fieldtype: "Float", label: __("Seat height (mm)"), default: 450, depends_on: isOf("Chair") },
+				{ fieldname: "slats", fieldtype: "Int", label: __("Back slats / bed slats"), default: 4, depends_on: isOf("Chair", "Bed"), description: __("Bed: use about 14") },
+				{ fieldname: "shelves", fieldtype: "Int", label: __("Shelves"), default: 4, depends_on: isOf("Bookshelf", "TV Unit") },
+				{ fieldname: "replace", fieldtype: "Check", label: __("Replace current parts"), default: this.parts.length ? 0 : 1 },
+			],
+			primary_action_label: __("Build"),
+			primary_action: (v) => {
+				d.hide();
+				this.buildFurniture(v);
+			},
+		});
+		d.show();
+	}
+
+	buildFurniture(v) {
+		const W = num(v.width), D = num(v.depth), H = num(v.height), T = num(v.thickness);
+		const leg = num(v.leg_size) || 50;
+		const type = v.type;
+		if (W < 100 || D < 100 || H < 100 || T < 5) return frappe.msgprint(__("The sizes are too small."));
+
+		if (type === "Bookshelf" || type === "TV Unit") {
+			return this.buildCabinet({
+				width: W, height: H, depth: D, plinth: 0, thickness: T,
+				shelves: type === "Bookshelf" ? v.shelves : Math.min(num(v.shelves), 1),
+				doors: type === "TV Unit" ? "2" : "0", back: "Overlay", back_thickness: 6, replace: v.replace,
+			});
+		}
+
+		const offsetX = v.replace ? 0 : this.nextFreeX(W);
+		const parts = [];
+		// top = flat panel, side = upright panel (thickness along x), back = upright panel (thickness along z)
+		const add = (key, o) => parts.push(this.newPart(key, { ...o, pos_x: num(o.pos_x) + offsetX }));
+		const round = v.leg_style === "Round";
+		const post = (name, h, x, z) => {
+			const o = { part_name: name, length_mm: h, width_mm: leg, thickness_mm: leg, pos_x: x, pos_y: h / 2, pos_z: z, grain: "Along Length", edge_band_long: 0 };
+			add("side", round ? { ...o, shape: "Cylinder" } : o);
+		};
+		const rail = 18;
+
+		if (["Dining Table", "Coffee Table", "Study Desk", "Bench"].includes(type)) {
+			const inset = 40, legH = H - T;
+			const lx = W / 2 - inset - leg / 2, lz = D / 2 - inset - leg / 2;
+			add("top", { part_name: type === "Bench" ? __("Seat") : __("Table top"), length_mm: W, width_mm: D, thickness_mm: T, pos_y: legH + T / 2, grain: "Along Length", edge_band_long: 2, edge_band_short: 2 });
+			[["Front left leg", -lx, lz], ["Front right leg", lx, lz], ["Back left leg", -lx, -lz], ["Back right leg", lx, -lz]]
+				.forEach(([n, x, z]) => post(__(n), legH, x, z));
+			if (v.apron) {
+				const ah = Math.min(100, legH / 3), y = legH - ah / 2;
+				const spanX = W - 2 * inset - 2 * leg, spanZ = D - 2 * inset - 2 * leg;
+				const ax = W / 2 - inset - rail / 2, az = D / 2 - inset - rail / 2;
+				add("back", { part_name: __("Front apron"), length_mm: spanX, width_mm: ah, thickness_mm: rail, pos_y: y, pos_z: az });
+				add("back", { part_name: __("Back apron"), length_mm: spanX, width_mm: ah, thickness_mm: rail, pos_y: y, pos_z: -az });
+				add("side", { part_name: __("Left apron"), length_mm: ah, width_mm: spanZ, thickness_mm: rail, pos_y: y, pos_x: -ax });
+				add("side", { part_name: __("Right apron"), length_mm: ah, width_mm: spanZ, thickness_mm: rail, pos_y: y, pos_x: ax });
+			}
+		} else if (type === "Chair") {
+			const seatH = num(v.seat_height) || 450, slats = Math.max(parseInt(v.slats) || 0, 0);
+			const lx = W / 2 - leg / 2, lz = D / 2 - leg / 2;
+			const frontH = seatH - T;
+			post(__("Front left leg"), frontH, -lx, lz);
+			post(__("Front right leg"), frontH, lx, lz);
+			post(__("Back left post"), H, -lx, -lz);
+			post(__("Back right post"), H, lx, -lz);
+			add("top", { part_name: __("Seat"), length_mm: W, width_mm: D, thickness_mm: T, pos_y: seatH - T / 2, grain: "Along Length", edge_band_long: 2, edge_band_short: 2 });
+			const ah = 60, ay = frontH - ah / 2, spanX = W - 2 * leg, spanZ = D - 2 * leg;
+			add("back", { part_name: __("Front apron"), length_mm: spanX, width_mm: ah, thickness_mm: rail, pos_y: ay, pos_z: D / 2 - rail / 2 });
+			add("back", { part_name: __("Back apron"), length_mm: spanX, width_mm: ah, thickness_mm: rail, pos_y: ay, pos_z: -(D / 2 - rail / 2) });
+			add("side", { part_name: __("Left apron"), length_mm: ah, width_mm: spanZ, thickness_mm: rail, pos_y: ay, pos_x: -(W / 2 - rail / 2) });
+			add("side", { part_name: __("Right apron"), length_mm: ah, width_mm: spanZ, thickness_mm: rail, pos_y: ay, pos_x: W / 2 - rail / 2 });
+			const topRailH = 100, botY = seatH + 120, botH = 60, backZ = -(D / 2 - rail / 2);
+			add("back", { part_name: __("Top back rail"), length_mm: spanX, width_mm: topRailH, thickness_mm: rail, pos_y: H - topRailH / 2, pos_z: backZ });
+			add("back", { part_name: __("Lower back rail"), length_mm: spanX, width_mm: botH, thickness_mm: rail, pos_y: botY + botH / 2, pos_z: backZ });
+			if (slats) {
+				const gapTop = H - topRailH, gapBot = botY + botH, slatW = 40;
+				const step = spanX / slats;
+				for (let i = 0; i < slats; i++) {
+					add("back", { part_name: slats > 1 ? __("Back slat {0}", [i + 1]) : __("Back slat"), length_mm: slatW, width_mm: gapTop - gapBot, thickness_mm: 12, pos_y: (gapTop + gapBot) / 2, pos_x: -spanX / 2 + step * (i + 0.5), pos_z: backZ, grain: "Along Width" });
+				}
+			}
+		} else if (type === "Bed") {
+			const railH = 200, railT = T, legH = 250;
+			const Wo = W + 2 * railT, hb = H, fb = Math.min(450, H);
+			const px = Wo / 2 - leg / 2, pz = D / 2 - leg / 2;
+			post(__("Head left post"), hb, -px, -pz);
+			post(__("Head right post"), hb, px, -pz);
+			post(__("Foot left post"), fb, -px, pz);
+			post(__("Foot right post"), fb, px, pz);
+			const span = Wo - 2 * leg, spanZ = D - 2 * leg;
+			add("back", { part_name: __("Headboard"), length_mm: span, width_mm: hb - legH, thickness_mm: T, pos_y: legH + (hb - legH) / 2, pos_z: -pz, grain: "Along Length" });
+			add("back", { part_name: __("Footboard"), length_mm: span, width_mm: fb - legH, thickness_mm: T, pos_y: legH + (fb - legH) / 2, pos_z: pz, grain: "Along Length" });
+			add("side", { part_name: __("Left side rail"), length_mm: railH, width_mm: spanZ, thickness_mm: railT, pos_y: legH + railH / 2, pos_x: -px });
+			add("side", { part_name: __("Right side rail"), length_mm: railH, width_mm: spanZ, thickness_mm: railT, pos_y: legH + railH / 2, pos_x: px });
+			const slats = Math.max(parseInt(v.slats) || 0, 0), slatW = 70;
+			for (let i = 0; i < slats; i++) {
+				add("top", { part_name: __("Bed slat {0}", [i + 1]), length_mm: Wo - 2 * railT, width_mm: slatW, thickness_mm: 18, pos_y: legH + railH - 9 - 20, pos_z: -spanZ / 2 + slatW / 2 + ((spanZ - slatW) * i) / Math.max(slats - 1, 1), grain: "Along Length" });
+			}
 		}
 
 		if (v.replace) this.parts.splice(0, this.parts.length);
@@ -1200,7 +1338,7 @@ class Designer {
 		this.$panel.append(`<h5>${__("Parts")}</h5>`);
 		if (!this.parts.length) {
 			this.$panel.append(
-				`<p class="f3d-hint">${__("Build a cabinet, add parts or pick fittings from the library. You can also upload a GLB, OBJ or cut list on the Design Project form.")}</p>`
+				`<p class="f3d-hint">${__("Build a cabinet, table, chair or bed, add parts or pick fittings from the library. You can also upload a GLB, OBJ or cut list on the Design Project form.")}</p>`
 			);
 			return;
 		}
