@@ -186,7 +186,8 @@ def _fill_bom(bom, doc, item_code, totals, settings, joint_ops=None):
 		)
 
 	bom.with_operations = 0
-	if not cint(settings.with_operations):
+	# an unsaved Designer Settings has no value yet; the field's default is on
+	if settings.with_operations is not None and not cint(settings.with_operations):
 		return
 	minutes: dict[tuple, float] = {}
 	operations = settings.operations or default_operations()
@@ -209,6 +210,9 @@ def default_operations() -> list:
 	"""Starter routing used when Designer Settings has no operations configured."""
 	from frappe_3d_designer.install import DEFAULT_OPERATIONS
 
+	from frappe_3d_designer.install import seed_operations
+
+	seed_operations()  # masters may be missing if install/migrate seeding failed
 	rows = []
 	for name, mins, per_part in DEFAULT_OPERATIONS:
 		if frappe.db.exists("Operation", name):
