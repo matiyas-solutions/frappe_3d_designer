@@ -91,7 +91,9 @@ def seed_operations():
 	"""Operations + workstations so a generated BOM always carries a routing."""
 	for name, _mins, _per_part in DEFAULT_OPERATIONS:
 		station = _ensure("Workstation", f"{name} Station", workstation_name=f"{name} Station")
-		_ensure("Operation", name, name=name, workstation=station)
+		# an Operation is still useful without a workstation, so never let one failure drop the routing
+		if not _ensure("Operation", name, name=name, workstation=station) and station:
+			_ensure("Operation", name, name=name)
 
 
 def seed_hardware():
