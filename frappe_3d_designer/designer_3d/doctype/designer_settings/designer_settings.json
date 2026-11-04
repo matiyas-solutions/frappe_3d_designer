@@ -118,7 +118,8 @@
   {
    "fieldname": "with_operations",
    "fieldtype": "Check",
-   "label": "Add Operations to BOM"
+   "label": "Add Operations to BOM",
+   "default": "1"
   },
   {
    "fieldname": "operations",
