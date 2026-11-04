@@ -168,8 +168,14 @@ def nest_design(parts, material_docs: dict) -> tuple[list[dict], dict[int, list[
 		for sheet in sheets:
 			for pl in sheet["placements"]:
 				part_sheets.setdefault(pl["part_idx"], []).append(f"{material[:12]}-{sheet['sheet_no']}")
+			area = sum(pl["w"] * pl["h"] for pl in sheet["placements"])
 			rows.append(
 				{
+					"cut_list": "\n".join(
+						f"{pl['label']}  {pl['part_name']}  {pl['w']:g} × {pl['h']:g} mm"
+						for pl in sorted(sheet["placements"], key=lambda x: str(x["label"]))
+					),
+					"waste_percent": round(100 - area / (sheet_l * sheet_w) * 100, 1),
 					"material": material,
 					"sheet_no": sheet["sheet_no"],
 					"sheet_size": f"{sheet_l:g} × {sheet_w:g}",

@@ -10,6 +10,8 @@
   "sheet_size",
   "parts_count",
   "utilisation_percent",
+  "waste_percent",
+  "cut_list",
   "layout_json"
  ],
  "fields": [
@@ -48,6 +50,18 @@
    "label": "Utilisation",
    "in_list_view": 1,
    "columns": 2
+  },
+  {
+   "fieldname": "waste_percent",
+   "fieldtype": "Percent",
+   "label": "Waste %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cut_list",
+   "fieldtype": "Small Text",
+   "label": "Cut List (pieces cut from this sheet)",
+   "read_only": 1
   },
   {
    "fieldname": "layout_json",

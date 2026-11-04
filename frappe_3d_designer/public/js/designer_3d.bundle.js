@@ -647,14 +647,32 @@ class Designer {
 		const options = Object.entries(PRESETS)
 			.map(([key, p]) => `<option value="${key}">${__(p.label)}</option>`)
 			.join("");
-		$(`<select class="f3d-add" aria-label="${__("Add part")}">
-				<option value="">${__("Add part")}</option>${options}
+		const $add = $(`<select class="f3d-add" aria-label="${__("Add part")}">
+				<option value="">${__("Add part")}</option>
+				<optgroup label="${__("Panels")}">${options}</optgroup>
 			</select>`)
 			.appendTo($t)
 			.on("change", (e) => {
-				if (e.target.value) this.addPart(e.target.value);
+				const v = e.target.value;
+				if (v.startsWith("lib:")) {
+					const c = (this.library || []).find((x) => x.name === v.slice(4));
+					if (c) this.addLibraryPart(c);
+				} else if (v) {
+					this.addPart(v);
+				}
 				e.target.value = "";
 			});
+		// screws, glue, handles, hinges... come from the parts library
+		frappe.xcall("frappe_3d_designer.api.get_library").then((items) => {
+			this.library = items || [];
+			const groups = {};
+			this.library.forEach((c) => (groups[c.category || "Other"] ||= []).push(c));
+			Object.entries(groups).forEach(([cat, list]) => {
+				$add.append(`<optgroup label="${frappe.utils.escape_html(__(cat))}">${list
+					.map((c) => `<option value="lib:${frappe.utils.escape_html(c.name)}">${frappe.utils.escape_html(c.name)}</option>`)
+					.join("")}</optgroup>`);
+			});
+		});
 		btn($t, __("From library"), () => this.libraryDialog(), __("Fittings, handles, legs and profiles"));
 		btn($t, __("Cabinet"), () => this.cabinetDialog(), __("Build a parametric cabinet"));
 
@@ -1101,6 +1119,7 @@ class Designer {
 			length_mm: num(c.length_mm) || 50,
 			width_mm: num(c.width_mm) || 20,
 			thickness_mm: num(c.thickness_mm) || 20,
+			qty: parseInt(c.default_qty) || 1,
 		});
 		const ref = this.selected;
 		if (ref) {

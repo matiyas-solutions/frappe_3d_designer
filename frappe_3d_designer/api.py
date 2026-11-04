@@ -121,7 +121,7 @@ def get_library():
 	return frappe.get_all(
 		"Design Library Component",
 		fields=["name", "category", "item_code", "shape", "orientation", "length_mm", "width_mm",
-			"thickness_mm", "image", "description"],
+			"thickness_mm", "default_qty", "image", "description"],
 		order_by="category asc, name asc",
 	)
 

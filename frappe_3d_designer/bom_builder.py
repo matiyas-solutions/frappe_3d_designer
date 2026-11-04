@@ -22,6 +22,7 @@ import frappe
 from frappe import _
 from frappe.utils import cint, flt, now_datetime
 
+from frappe_3d_designer.geometry import is_board
 from frappe_3d_designer.workshop import connector_requirements
 
 HASH_FIELDS = (
@@ -90,6 +91,9 @@ def collect_materials(doc, settings) -> tuple[dict[str, float], list[str], dict[
 
 		if material.calculation_basis != "Sheet":
 			add(material.item_code, part_quantity(p, material.calculation_basis) * waste)
+		elif not is_board(p):
+			# cylinders cannot be nested on a sheet: buy them by area so they are not lost from the BOM
+			add(material.item_code, part_quantity(p, "Area") * waste)
 		elif p.material != material_name:
 			errors.append(
 				_("Row {0}: {1} uses the fallback material, which is sheet based. Set its material so it can be nested.").format(
@@ -100,6 +104,18 @@ def collect_materials(doc, settings) -> tuple[dict[str, float], list[str], dict[
 			add(material.edge_band_item, edge_length_m(p) * waste)
 
 	# whole sheets from the cutting plan
+	nested = {row.material for row in doc.get("sheet_layouts") or []}
+	for p in doc.parts:
+		if p.item_code or not p.material or p.material in nested or not is_board(p):
+			continue
+		if p.material not in cache:
+			cache[p.material] = frappe.get_cached_doc("Design Material Map", p.material)
+		if cache[p.material].calculation_basis == "Sheet":
+			errors.append(
+				_("Row {0}: {1} could not be placed on a sheet, so it would be missing from the BOM. Check the cutting plan.").format(
+					p.idx, frappe.bold(p.part_name)
+				)
+			)
 	for row in doc.get("sheet_layouts") or []:
 		if row.material not in cache:
 			cache[row.material] = frappe.get_cached_doc("Design Material Map", row.material)
@@ -173,8 +189,9 @@ def _fill_bom(bom, doc, item_code, totals, settings, joint_ops=None):
 	if not cint(settings.with_operations):
 		return
 	minutes: dict[tuple, float] = {}
+	operations = settings.operations or default_operations()
 	part_count = sum(cint(p.qty) or 1 for p in doc.parts if not p.item_code)
-	for op in settings.operations or []:
+	for op in operations:
 		key = (op.operation, op.workstation)
 		minutes[key] = minutes.get(key, 0.0) + flt(op.time_in_mins) * (part_count if cint(op.per_part) else 1)
 	for key, mins in (joint_ops or {}).items():
@@ -186,6 +203,18 @@ def _fill_bom(bom, doc, item_code, totals, settings, joint_ops=None):
 			"operations",
 			{"operation": operation, "workstation": workstation, "time_in_mins": flt(mins, 2) or 1},
 		)
+
+
+def default_operations() -> list:
+	"""Starter routing used when Designer Settings has no operations configured."""
+	from frappe_3d_designer.install import DEFAULT_OPERATIONS
+
+	rows = []
+	for name, mins, per_part in DEFAULT_OPERATIONS:
+		if frappe.db.exists("Operation", name):
+			rows.append(frappe._dict(operation=name, workstation=frappe.db.get_value("Operation", name, "workstation"),
+				time_in_mins=mins, per_part=per_part))
+	return rows
 
 
 def sync_bom(design: str, force: bool = False) -> str:
