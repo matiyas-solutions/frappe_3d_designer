@@ -27,7 +27,7 @@ Roles: Phases 1 and 2 are done once by an admin. Phases 3 to 9 are done by desig
 | 1.1 | `cd ~/frappe-bench` | |
 | 1.2 | `bench get-app <repo-url> --branch main` | App downloaded |
 | 1.3 | `bench build --app frappe_3d_designer` | Three.js bundle built |
-| 1.4 | `bench --site <site> install-app frappe_3d_designer` | DocTypes, custom field `BOM.design_project`, 4 starter connection rules created |
+| 1.4 | `bench --site <site> install-app frappe_3d_designer` | DocTypes, custom field `BOM.design_project`, 4 starter connection rules, 5 starter Operations with workstations (Panel Cutting, Edge Banding, Drilling, Assembly, Packing) and 10 starter hardware Items and library components (Screw, Handle, Hinge, Cam Lock and so on) |
 | 1.5 | `bench --site <site> migrate` then `bench restart` | App live |
 
 Requires Frappe/ERPNext v16, Python 3.14+, Node 24.
@@ -67,7 +67,7 @@ Open the 4 starter rules (Dowel 8x35, Cam and Dowel, Back Panel Screw, Back Pane
 - Set the operation and minutes per connector.
 
 ### Step 2.4: Design Library Components
-Add reusable parts (hinges, handles, legs, runners, profiles) so designers can insert them from the designer page.
+Install already adds starter hardware (Screw, Gum, Handle, Hinge, Cam Lock, Wooden Dowel, Furniture Leg, Drawer Runner, Edge Band Tape, Nails) as Items and library components. Add your own hinges, handles, legs, runners and profiles here. They appear in the designer's **Add part** list, grouped by category.
 
 ### Step 2.5: Designer Settings
 - Default connection rule and thin-panel rule, plus the thin-panel limit (for back panels).
@@ -76,7 +76,7 @@ Add reusable parts (hinges, handles, legs, runners, profiles) so designers can i
 - BOM options: make it default, submit automatically.
 - Unit of uploaded models (GLB is usually metres).
 - Detect Joints Automatically (tick to enable).
-- Optional operations (Cutting, Edge Banding, Assembly) with workstation and minutes.
+- Operations table (workstation and minutes per operation). Leave it empty to use the starter routing (Panel Cutting, Edge Banding, Drilling, Assembly, Packing). Untick *With Operations* to produce a BOM without a routing.
 
 **Setup is complete when:** every material you will use has a Material Map, and the rules point to real hardware Items.
 
@@ -99,10 +99,22 @@ Add reusable parts (hinges, handles, legs, runners, profiles) so designers can i
 
 | Step | Action |
 |---|---|
-| A.1 | Click **Cabinet**. Enter the size, plinth, shelves, doors and back type (overlay or grooved). |
+| A.1 | For a cabinet, click **Cabinet**. Enter the size, plinth, shelves, doors and back type (overlay or grooved). |
+| A.1b | For other furniture, click **Furniture** and pick the type (see table below). |
 | A.2 | Choose the material for carcass, doors and back. |
-| A.3 | Confirm. The parts are generated. |
-| A.4 | Add extra panels from the **panel presets**, or hardware from the **parts library**. |
+| A.3 | Confirm (**Build** for furniture). The parts are generated. |
+| A.4 | Add extra panels from **Add part → Panels**, or hardware (screws, glue, handles, hinges and so on) from the other groups in the same list. |
+
+Furniture types and their options:
+
+| Type | Options |
+|---|---|
+| Dining Table, Coffee Table, Study Desk, Bench | Width, depth, height, top thickness, leg size, leg style (square or round), apron |
+| Chair | Same, plus seat height and number of back slats |
+| Bed | Width, depth, headboard height, leg/post size, number of slats (about 14) |
+| Bookshelf, TV Unit | Width, depth, height, board thickness, shelves (built as a cabinet) |
+
+Choosing a type fills in typical sizes, which you can change. Tick **Replace current parts** to start over, otherwise the new piece is placed beside the existing parts.
 
 ### Route B: Upload a file
 
@@ -133,7 +145,7 @@ Select a part and change:
 - Length, width, thickness, qty
 - Orientation, exact X/Y/Z position
 - Edge banding (long and short edges)
-- Hardware item (added per piece)
+- Hardware item (added per piece). To add a loose item such as a screw or handle, use **Add part** and choose it from the library groups.
 - Machining rows: Drill (face, X, Y, diameter, depth), Route, Pocket, Edge Profile, Miter, Groove
 
 Also available: **duplicate**, **rotate 90°**, **delete**, and **drag to move** (5 mm snap).
@@ -161,7 +173,7 @@ Save
  ├─ 3. Connectors placed along each joint
  │     └─ boreholes generated (face and edge holes)
  ├─ 4. Nesting (MaxRects) per sheet material
- │     └─ uses kerf, trim, grain → sheet layouts
+ │     └─ uses kerf, trim, grain → sheet layouts, with a cut list and waste % per sheet
  └─ 5. Background job: BOM sync (Phase 7)
 ```
 
@@ -178,10 +190,12 @@ Errors appear at the top of the Design Project form.
 | 7.3 | Check the rows. |
 
 How the BOM is built:
-- Sheet materials: whole sheets from the cutting plan.
+- Sheet materials: whole sheets from the cutting plan. Each sheet layout lists its cut pieces and waste %.
+- Cylinders (round legs, screws) cannot be nested, so they are bought by area and still appear in the BOM.
 - Area, volume and length materials: calculated from the part sizes, plus wastage %.
 - Banded edges: edge banding item, in metres.
 - Joints: connector hardware and operation minutes.
+- Operations: from Designer Settings, or the starter routing if none is set. Per-piece operations scale with part count, others are fixed minutes.
 - Parts with a Hardware Item: added per piece.
 - The same raw material across parts is merged into one BOM row.
 
@@ -237,6 +251,8 @@ Map the DXF layer names to operations once in your CAM software.
 | No hardware in the BOM | Rule has no connection items | Add hardware Items to the Connection Rule |
 | BOM not updated | Background job still running or failed | Check the form error banner and the background jobs list |
 | Edge banding missing in the BOM | No edge banding item on the material | Set it in the Material Map |
+| "Could not be placed on a sheet" error | A board part is larger than the sheet or no layout was produced | Check the part size and the sheet size, kerf and trim in the Material Map |
+| BOM has no operations | *With Operations* is unticked, or Operation masters are missing | Tick it in Designer Settings; saving the BOM re-creates the starter Operations and workstations |
 | Nesting looks wrong | Wrong sheet size, kerf or trim | Fix them in the Material Map |
 
 ## Limits
